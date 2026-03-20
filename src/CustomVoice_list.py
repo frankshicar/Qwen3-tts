@@ -1,5 +1,14 @@
 import json
 import os
+import sys
+from pathlib import Path
+
+# Ensure the project root is on `sys.path` so `import qwen_tts` works when running:
+#   python src/CustomVoice.py
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 import torch
 import soundfile as sf
 from qwen_tts import Qwen3TTSModel
@@ -35,9 +44,19 @@ for list_name, words in word_lists.items():
 
         wavs, sr = model.generate_custom_voice(
             text=word,
-            instruct="請用平穩、沒有起伏的機器人語氣唸出這個字",
+            instruct=(
+                "請以標準普通話發音朗讀這個單字，發音必須：1) 單音節，不重複；2) 完全中性平直，無任何情緒或語氣；"
+                "3) 起音乾淨清晰，無氣聲、嘆氣或吸氣聲；4) 結尾立即停止，不拖長、不帶氣尾；5) 音量穩定一致。"
+                "這是用於聽能復健訓練的標準發音示範。"
+            ),
             language="Chinese",
             speaker="Vivian",
+            # 聽能復健專用：最大化一致性，最小化語氣變化
+            do_sample=False,           # 確定性輸出
+            temperature=0.005,          # 極低溫度，減少隨機性
+            top_p=0.8,                 # 限制採樣範圍
+            max_new_tokens=128,        # 限制長度，避免拖長
+            repetition_penalty=1.2,    # 避免重複發音
         )
         sf.write(output_path, wavs[0], sr)
         print(f"  Saved: {output_path}")
