@@ -386,7 +386,7 @@ To launch the demo, you can use the following commands:
 
 ```bash
 # CustomVoice model
-qwen-tts-demo Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice --ip 0.0.0.0 --port 8000
+qwen-tts-demo Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice --ip 0.0.0.0 --port 8000 還有加上 --no-flash-attn
 # VoiceDesign model
 qwen-tts-demo Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign --ip 0.0.0.0 --port 8000
 # Base model
